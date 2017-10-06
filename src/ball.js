@@ -1,58 +1,88 @@
 
 
 export default class Ball {
-  constructor() {
+  constructor(x, y, radius) {
     //Position
-    this.x = 490;
-    this.y = 900;
-    //X Direction
-    this.Xdirection = 'right';
-    //Y Direction
-    this.Ydirection = 'up';
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.Xspeed;
+    this.Yspeed;
+    this.setSpeed();
+    this.XspeedLimit = 6;
+    this.YspeedLimit = 6;
     //Binding class functions
     this.update = this.update.bind(this);
     this.render = this.render.bind(this);
-    //this.getPosition = this.getPosition.bind(this);
+    this.getPosition = this.getPosition.bind(this);
+    this.getSpeed = this.getSpeed.bind(this);
+    this.changeSpeedY = this.changeSpeedY.bind(this);
+    this.changeSpeedX = this.changeSpeedX.bind(this);
+    this.setPosition = this.setPosition.bind(this);
+    this.setSpeed = this.setSpeed.bind(this);
   }
-//  this.getPosition() {
 
-//  }
+  setPosition(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  setSpeed() {
+    //X Direction
+    this.Xspeed = Math.random() * 4 + 1;
+    //Y Direction
+    this.Yspeed = -2.5;
+  }
+  getPosition() {
+    return {x: this.x, y: this.y};
+  }
+  getSpeed() {
+    return {x: this.Xspeed, y: this.Yspeed};
+  }
+
+  changeSpeedY(accel) {
+    this.Yspeed *= accel;
+    if(Math.abs(this.Yspeed) > this.YspeedLimit) {
+      this.Yspeed = this.YspeedLimit;
+    }
+    if(Math.abs(this.Yspeed) < 0.5) {
+      this.Yspeed = -0.5;
+    }
+  }
+
+  changeSpeedX(accel) {
+    this.Xspeed *= accel;
+    if(Math.abs(this.Xspeed) > this.XspeedLimit) {
+      this.Xspeed = this.XspeedLimit;
+    }
+  }
+
   update(x, y) {
-    switch (this.x) {
-      case 986:
-        this.Xdirection = 'left';
-        break;
-      case 0:
-        this.Xdirection = 'right';
-        break;
+    var edge = 1000 - this.radius;
+    //Edge of the Screen Checks
+    if(this.x >= edge && this.Xspeed > 0) {
+      this.Xspeed = -this.Xspeed
     }
-    if(this.y < 0) {
-      this.Ydirection = 'down';
+    if(this.x <= this.radius && this.Xspeed < 0) {
+      this.Xspeed = -this.Xspeed;
     }
-    if(this.y > 985) {
-      this.Ydirection = 'up';
+    if(this.y <= this.radius + 50) {
+      this.Yspeed = -this.Yspeed;
     }
-    switch (this.Xdirection) {
-      case 'right':
-        this.x += 2;
-        break;
-      case 'left':
-        this.x -= 2;
-        break;
-    }
-    switch (this.Ydirection) {
-      case 'up':
-        this.y -= 2;
-        break;
-      case 'down':
-        this.y += 2;
-        break;
-    }
+    this.x += this.Xspeed;
+    this.y += this.Yspeed;
   }
   render(context) {
     context.save();
-    context.fillStyle = 'green';
-    context.fillRect(this.x, this.y, 15, 15);
+    context.fillStyle = 'red';
+    context.beginPath();
+    context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    context.closePath();
+    context.fill();
+    context.fillStyle = 'maroon';
+    context.beginPath();
+    context.arc(this.x, this.y, 15, 0, Math.PI * 2);
+    context.closePath();
+    context.fill();
     context.restore();
   }
 }
